@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secret Panel</title>
+  <style>
+    /* Position the back button fixed at the bottom left */
+    #backButton {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+    
+    /* Styling for main containers */
+    #passcodeUI {
+      text-align: center;
+      margin-top: 50px;
+    }
+    
+    #content {
+      text-align: center;
+      margin-top: 50px;
+    }
+    
+    /* Iframe container */
+    #iframeContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+      display: none;
+      background: white;
+    }
+    
+    #frameContent {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    /* Button styling */
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    
+    button:hover {
+      background-color: #45a049;
+    }
+    
+    input {
+      padding: 8px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Passcode UI container -->
+  <div id="passcodeUI">
+    <h2>Enter Passcode:</h2>
+    <input type="text" id="passcodeInput" placeholder="Type here">
+    <button id="submitButton" onclick="checkPasscode()">Submit</button>
+    
+    <!-- Direct access button -->
+    <div style="margin-top: 30px">
+      <button onclick="loadArtClass()">Open ArtClass Site</button>
+    </div>
+  </div>
+  
+  <!-- Container for new UI content when "artclass" is entered -->
+  <div id="content"></div>
+  
+  <!-- Iframe container (initially hidden) -->
+  <div id="iframeContainer">
+    <iframe id="frameContent" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
+    <button id="backButton" onclick="closeFrame()">Back</button>
+  </div>
 
+  <script>
+    // Function to check passcode
+    function checkPasscode() {
+      var passcode = document.getElementById("passcodeInput").value;
+      
+      if (passcode === "6x") {
+        // Load classroom-6x-update in the iframe
+        loadSiteInFrame("https://classroom-6x-update.neocities.org");
+      } else if (passcode === "artclass") {
+        // Hide the passcode UI
+        document.getElementById("passcodeUI").style.display = "none";
+        
+        // Build the new UI dynamically
+        var contentDiv = document.getElementById("content");
+        contentDiv.innerHTML = ""; // Clear any previous content
+
+        // Create header element
+        var header = document.createElement("h2");
+        header.textContent = "Select Site to Open";
+        contentDiv.appendChild(header);
+
+        // Create the button for classroom v4
+        var classroomBtn = document.createElement("button");
+        classroomBtn.textContent = "Open Classroom V4";
+        classroomBtn.onclick = function() {
+          loadSiteInFrame("https://classroomv4.vercel.app");
+        };
+        contentDiv.appendChild(classroomBtn);
+        
+        // Create a button for artclass.site
+        var artclassBtn = document.createElement("button");
+        artclassBtn.textContent = "Open ArtClass Site";
+        artclassBtn.onclick = function() {
+          loadSiteInFrame("https://artclass.site");
+        };
+        contentDiv.appendChild(artclassBtn);
+
+        // Add a main menu button
+        var mainMenuBtn = document.createElement("button");
+        mainMenuBtn.textContent = "Back to Main Menu";
+        mainMenuBtn.onclick = function() {
+          window.location.reload();
+        };
+        contentDiv.appendChild(mainMenuBtn);
+      }
+    }
+    
+    // Function to load artclass.site directly
+    function loadArtClass() {
+      loadSiteInFrame("https://artclass.site");
+    }
+    
+    // Function to load a site in the iframe
+    function loadSiteInFrame(url) {
+      // Hide both passcode UI and content
+      document.getElementById("passcodeUI").style.display = "none";
+      document.getElementById("content").style.display = "none";
+      
+      // Set iframe source and show container
+      document.getElementById("frameContent").src = url;
+      document.getElementById("iframeContainer").style.display = "block";
+    }
+    
+    // Function to close the iframe and return to main UI
+    function closeFrame() {
+      // Hide iframe container
+      document.getElementById("iframeContainer").style.display = "none";
+      
+      // Show the passcode UI again
+      document.getElementById("passcodeUI").style.display = "block";
+      document.getElementById("content").style.display = "block";
+      
+      // Clear the iframe src
+      document.getElementById("frameContent").src = "";
+    }
+  </script>
+  
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(function(err) {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
